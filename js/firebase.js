@@ -155,11 +155,10 @@ function clearJqueryElement(inputObj){
   });
 }
 
-function setDBpath(user, $dateelement){
-  const date = $dateelement.val();
+function setDBpath(user, date){
   const subdbname = date.split('-').join('/');
   console.log(subdbname);
-  return "users/uid/" + subdbname;
+  return "users/" + user.uid + "/" + subdbname;
 }
 
 export {db, auth, provider, googleAuthLaterProcess ,logOut, getDbRefarence, setRealtimeDB, modifySetObj, clearJqueryElement, setDBpath};

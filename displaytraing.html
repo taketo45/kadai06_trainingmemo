@@ -81,8 +81,9 @@
     const td = new Date();
     const today = dateConvertHyphen(td);
     setDefalutDate(today);
+    const displaydate = $displaydate.val();
 
-    const dbname = setDBpath(user, $displaydate);
+    const dbname = setDBpath(user, displaydate);
     const dbRef = getDbRefarence(db, dbname);
 
     
@@ -92,8 +93,8 @@
         const key = data.key; //上がバリュー、これがキー。削除・更新にはキーが必要。
         const removeIcon = "img/remove.png";
         const updateIcon = "img/update.png";
-
-        const html = getTabelHtml(contents);
+        console.log(contents);
+        const html = getTabelHtml(contents,key);
         $("#output").append(html);
     });
 
@@ -109,8 +110,8 @@
             h += `<td class="td-item4 weight distance">${contents.distance} km</td>`;
             h += `<td class="td-item5 count minutes">${contents.minutes} 分</td>`;
             h += `<td class="td-item6 setcount"></td>`;
-            h += `<td class="td-btn-update"><button class="update-btn">更新</button></td>`;
-            h += `<td class="td-btn-remove"><button class="remove-btn">削除</button></td>`;
+            // h += `<td class="td-btn-update"><button class="update-btn" data-key="${key}" date=${contents.date.slice(0,10)}>更新</button></td>`;
+            h += `<td class="td-btn-remove"><button class="remove-btn" data-key="${key}" date=${contents.date.slice(0,10)}>削除</button></td>`;
             h += `</tr>`;
             // $("#output").append(h);
         } else {
@@ -119,8 +120,8 @@
             h += `<td class="td-item4 weight distance">${contents.weight} kg</td>`;
             h += `<td class="td-item5 count minutes">${contents.count} 回</td>`;
             h += `<td class="td-item6 setcount">${contents.setcount} セット</td>`;
-            h += `<td class="td-btn-update"><button class="update-btn">更新</button></td>`;
-            h += `<td class="td-btn-remove"><button class="remove-btn">削除</button></td>`;
+            // h += `<td class="td-btn-update"><button class="update-btn" data-key="${key}" date=${contents.date.slice(0,10)}>更新</button></td>`;
+            h += `<td class="td-btn-remove"><button class="remove-btn" data-key="${key}" date=${contents.date.slice(0,10)}>削除</button></td>`;
             h += `</tr>`;
         }
         return h;
@@ -156,18 +157,27 @@
         }
     }
 
+    function getHidenDate(hidendatetime){
+        const date = hidendatetime.slice( 0, 10 );
+
+    }
 
     //削除イベント追加
     $("#output").on("click", ".remove-btn", function () {
+        const date = $(this).attr("date");
         const key = $(this).attr("data-key");//クリックした場所の属性を取得！
-        const remove_item = ref(db, "chat/" + key);//chatで指定しているので、絵だけのときもちゃんと消える！
+        const datapath = "users/"+ user.uid + "/" + date + "/" + key;
+        console.log("datapath: " + datapath);
+        const remove_item = ref(db, datapath);
         remove(remove_item);//Firebaseデータ削除関数
     });
-
     //更新イベント追加
     $("#output").on("click", ".update-btn", function () {
+        const date = $(this).attr("date");
         const key = $(this).attr("data-key");
-        update(ref(db, "chat/" + key), {
+        const datapath = "users/"+ user.uid + "/" + date + "/" + key;
+        console.log("datapath: " + datapath);
+        update(ref(db, datapath), {
             message: $("#" + key + '_update').html()
         });
     });
@@ -176,40 +186,6 @@
     onChildRemoved(dbRef, (data) => {
         $("#" + data.key).remove(); //HTML側（DOM側）の操作。削除したものをユーザーに見える側でも削除！
     })
-
-
-    // function getRealTimeDbData () {
-//         const serchdate = $displaydate.val().split('-').join('/');
-//         const subdbname = $dateelement.val().split('-').join('/');
-//   console.log(subdbname);
-//   return "users/uid/" + subdbname;
-
-        // const dbname = setDBpath(user, $displaydate);
-        // const dbRef = getDbRefarence(db, dbname);
-        // const ref = db.ref(dbname);
-    
-
-        // dbRef.once('value')
-        //     .then((snapshot) => {
-        //     if (snapshot.exists()) {
-        //         const data = snapshot.val();
-        //         document.getElementById('resultArea').textContent = 
-        //         JSON.stringify(data, null, 2);
-        //     } else {
-        //         console.log("データが存在しません");
-        //     }
-        //     })
-        //     .catch((error) => {
-        //     console.error("エラーが発生しました: ", error);
-        //     });
-
-
-        // dbRef.on('value', (snapshot) => {
-        //     console.log(snapshot.val());
-        //     }, (errorObject) => {
-        //     console.log('The read failed: ' + errorObject.name);
-        // }); 
-    // }
 
 
     $logout.on("click", function(){

@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>トレログ</title>
+  <!-- <link rel="stylesheet" href="css/reset.css"> -->
   <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
   <header>
     <div class="header-left">
         <h1 class="header-logo"><img src="assets/img/logo_tralog.png" alt="タイトルロゴ"></h1>
-        <!-- <p class="header-logo-p">~継続は力なり~</p> -->
     </div>
 
     <div class="header-right">
@@ -35,11 +35,9 @@
         </div>
         <div>
             <label class="inputtext" for="activity">アクティビティ</label>
-            <!-- <input class="input" id="activity" name="activity" type="text"
-                    placeholder="アクティビティ"> -->
             <select class="input" name="activity" id="activity" type="text" placeholder="上半身筋トレ" required>
-                <option value="">トレーニング種別選択</option>
-                <option value="筋トレ/上半身" selected>筋トレ/上半身</option>
+                <option value="" selected>トレーニング種別選択</option>
+                <option value="筋トレ/上半身">筋トレ/上半身</option>
                 <option value="筋トレ/下半身">筋トレ/下半身</option>
                 <option value="有酸素運動">有酸素運動</option>
             </select>
@@ -50,8 +48,8 @@
             <!-- <input class="input" id="training" name="traingin" type="text"
                     placeholder="トレーニング" required> -->
             <select class="input" name="training" id="training" type="text" placeholder="上半身筋トレ" required>
-                <option value="">トレーニング内容選択</option>
-                <option value="ラットプルダウン" selected>ラットプルダウン</option>
+                <option value="" selected>トレーニング内容選択</option>
+                <option value="ラットプルダウン">ラットプルダウン</option>
                 <option value="アームカール">アームカール</option>
                 <option value="ダンベルプレス">ダンベルプレス</option>
                 <option value="チェストプレス">チェストプレス</option>
@@ -62,13 +60,13 @@
         <div>
             <label class="inputtext" for="item4">負荷</label>
             <input class="input" id="item4" name="item4" type="text"
-                        placeholder="負荷" inputmode="numeric" value="30" required>
+                        placeholder="負荷" inputmode="numeric" required>
             <label class="unittext" for="item4">Kg</label>
         </div>
         <div>
             <label class="inputtext" for="count">回数</label>
             <input class="input" id="item5" name="item5" type="text"
-                placeholder="回数" inputmode="numeric" value="3" required>
+                placeholder="回数" inputmode="numeric" required>
             <label class="unittext" for="item5">回</label>
         </div>
         <div>
@@ -134,7 +132,8 @@
         const curentDatetime = getCurentDatetime(td);
         const dbElement = getDBinputObj(curentDatetime);
         // console.log(dbname);
-        const dbname = setDBpath(user, inputElement.$date);
+        const date = inputElement.$date.val();
+        const dbname = setDBpath(user, date);
         setRealtimeDB(getDbRefarence(db, dbname), dbElement);   
         clearJqueryElement(inputElement);
         setDefalutDate(today);

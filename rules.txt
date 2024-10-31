@@ -1,0 +1,13 @@
+//Authをログインで行う場合のルール
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".write": "$uid === auth.uid",
+        ".read":  "$uid === auth.uid",
+      }
+    }
+  }
+}
+
+//テスト用の認証

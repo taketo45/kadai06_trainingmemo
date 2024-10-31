@@ -1,0 +1,32 @@
+
+
+.modal {
+  display: none;
+ }
+
+ 
+/* モーダルのスタイル調整 */
+.modaal-content-container {
+  padding: 20px;
+}
+ 
+/* ✕ボタンの位置調整 */
+.modaal-close {
+  position: absolute;
+  top: -60px;
+  right: 0;
+}
+  
+/* ✕ボタンの色 */
+.modaal-close:after, 
+.modaal-close:before {
+  background:#ccc;  
+}
+  
+/* ホバーしたときの✕ボタンの色 */
+.modaal-close:focus:after,
+.modaal-close:focus:before,
+.modaal-close:hover:after,
+.modaal-close:hover:before {
+  background: #ca353b;
+}

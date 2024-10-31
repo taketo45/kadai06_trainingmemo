@@ -96,7 +96,7 @@
   <script src="js/common.js"></script>
     <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getDatabase, ref, push, set, remove, onChildAdded, onChildRemoved, onChildChanged, update } //updateを追加
+    import { getDatabase, ref, push, set, get, remove, onChildAdded, onChildRemoved, onChildChanged, update } //updateを追加
         from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
     import { getAuth, signInAnonymously, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } 
         from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
@@ -127,6 +127,11 @@
     const today = dateConvertHyphen(td);
     setDefalutDate(today);
 
+    // inputElement.$activity.on("change", function(e){
+    //     const dbname = "campany/activity";
+    //     getRealtimeDBSelectData(user, dbname, inputElement.$training);
+    // });
+
     //送信
     $submit.on("click", function (event) {
         const curentDatetime = getCurentDatetime(td);
@@ -146,6 +151,88 @@
     });
 })();
 
+// データ取得と表示の関数
+async function getRealtimeDBSelectData(user, dbname, $output) {
+    try {
+        const dbRef = getDbRefarence(db, dbname);
+        // ref(db, tablename); 
+        // データを一度に取得
+        console.log(dbRef);
+        // const snapshot = await get(dbRef);
+        // // テーブルボディをクリア
+        // // console.log(snapshot);
+        // $output.empty();
+
+        // const trainingKeys = Object.keys(snapshot.val());
+        // console.log('Training keys:', trainingKeys);
+
+        get(dbRef).then((snapshot) => {
+        const data = snapshot.val();
+        
+        // データが存在するか確認
+        if (data) {
+            const trainingKeys = Object.keys(data);
+            console.log('Training keys:', trainingKeys);
+        } else {
+            console.log("データが存在しません");
+            return []; // 空の配列を返す
+        }
+    }).catch((error) => {
+        console.error("エラーが発生しました:", error);
+    });
+        // if (snapshot.exists()) {
+        //     const trainingData = snapshot.val();
+            
+        //     Object.keys(trainingData).forEach(key => {
+        //         const option = $('<option>');
+        //         option.value = key;
+        //         option.textContent = key;
+        //         selectElement.appendChild(option);
+        //     });
+        // } else {
+        //     throw new Error("トレーニングデータが存在しません");
+        // }
+
+        // 取得したデータを処理
+        snapshot.forEach((data) => {
+            const contents = data.val();
+            const key = data.key;
+            console.log("contents: " + contents);
+
+            const html = getSelectHtml(contents,key);
+            $output.append(html);
+        
+        });
+    } catch (error) {
+        console.error("データ取得エラー:", error);
+    }
+}
+
+function getSelectHtml(contents,key){
+    // $("div-activity").val(contents.activity);
+    let h = "";
+    if (contents.activity === "有酸素運動") {
+        h = `<tr id=${key}>`;
+        h += `<td class="td-traning">${contents.training}</td>`;
+        h += `<td class="td-item4 weight distance">${contents.distance} km</td>`;
+        h += `<td class="td-item5 count minutes">${contents.minutes} 分</td>`;
+        h += `<td class="td-item6 setcount"></td>`;
+        // h += `<td class="td-btn-update"><button class="update-btn" data-key="${key}" date=${contents.date.slice(0,10)}>更新</button></td>`;
+        h += `<td class="td-btn-remove"><button class="remove-btn" data-key="${key}" date=${contents.date.slice(0,10)}>削除</button></td>`;
+        h += `</tr>`;
+        // $("#output").append(h);
+    } else {
+        h = `<tr id=${key}>`;
+        h += `<td class="td-traning">${contents.training}</td>`;
+        h += `<td class="td-item4 weight distance">${contents.weight} kg</td>`;
+        h += `<td class="td-item5 count minutes">${contents.count} 回</td>`;
+        h += `<td class="td-item6 setcount">${contents.setcount} セット</td>`;
+        // h += `<td class="td-btn-update"><button class="update-btn" data-key="${key}" date=${contents.date.slice(0,10)}>更新</button></td>`;
+        h += `<td class="td-btn-remove"><button class="remove-btn" data-key="${key}" date=${contents.date.slice(0,10)}>削除</button></td>`;
+        h += `</tr>`;
+    }
+    return h;
+}
 
 function getCurentDatetime(date){
     const ymd= date.toLocaleDateString('ja-JP');

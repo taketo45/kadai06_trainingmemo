@@ -36,7 +36,7 @@
     </form>
 
     <h2>2024/10/30</h2>
-    <div id="div-activity">筋トレ/上半身</div>
+    <!-- <div id="div-activity">筋トレ/上半身</div> -->
     <table id="tbl-training">
       <tbody id="output">
       </tbody>
@@ -59,7 +59,7 @@
   <script src="js/common.js"></script>
     <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getDatabase, ref, push, set, remove, onChildAdded, onChildRemoved, onChildChanged, update} //updateを追加
+    import { getDatabase, ref, push, set, get, remove, onChildAdded, onChildRemoved, onChildChanged, update} //updateを追加
         from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
     import { getAuth, signInAnonymously, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } 
         from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
@@ -81,7 +81,7 @@
     const td = new Date();
     const today = dateConvertHyphen(td);
     setDefalutDate(today);
-    const displaydate = $displaydate.val();
+    let displaydate = $displaydate.val();
 
     const dbname = setDBpath(user, displaydate);
     const dbRef = getDbRefarence(db, dbname);
@@ -91,18 +91,30 @@
     onChildAdded(dbRef, function (data) {
         const contents = data.val(); //これをすることでオブジェクト変数になる
         const key = data.key; //上がバリュー、これがキー。削除・更新にはキーが必要。
-        const removeIcon = "img/remove.png";
-        const updateIcon = "img/update.png";
         console.log(contents);
         const html = getTabelHtml(contents,key);
         $("#output").append(html);
     });
 
-    $displaybtn.on("click", ()=> {
-        getRealTimeDbData(user, displaydate);
+    onChildChanged(dbRef, (data) => {
+        $("#" + data.key + '_update').html(data.val().message);
+        $("#" + data.key + '_update').fadeOut(800).fadeIn(800);
+    });
+
+    // $displaybtn.on("click", ()=> {
+    //     displaydate = $displaydate.val();
+    //     console.log("displaydate" + displaydate);
+    //     getRealTimeDbData(user, displaydate);
+    // });
+    $displaydate.change(()=>{
+        displaydate = $displaydate.val();
+        console.log("displaydate" + displaydate);
+        const dbname = setDBpath(user, displaydate);
+        getRealTimeDbData(user, dbname, $("#output"));
     });
 
     function getTabelHtml(contents,key){
+        // $("div-activity").val(contents.activity);
         let h = "";
         if (contents.activity === "有酸素運動") {
             h = `<tr id=${key}>`;
@@ -128,28 +140,21 @@
     }
 
         // データ取得と表示の関数
-    async function getRealTimeDbData(user, displaydate) {
+    async function getRealTimeDbData(user, dbname, $output) {
         try {
-            const dbname = setDBpath(user, displaydate);
             const dbRef = getDbRefarence(db, dbname);
-            
             // データを一度に取得
             const snapshot = await get(dbRef);
-            
             // テーブルボディをクリア
-            // const tableBody = document.getElementById('tableBody');
-            // tableBody.innerHTML = '';
-            $("#output").val('');
+            $output.empty();
             
             // 取得したデータを処理
             snapshot.forEach((data) => {
                 const contents = data.val();
                 const key = data.key;
-                const removeIcon = "img/remove.png";
-                const updateIcon = "img/update.png";
 
                 const html = getTabelHtml(contents,key);
-                $("#output").append(html);
+                $output.append(html);
             
             });
         } catch (error) {
